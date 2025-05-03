@@ -3,7 +3,7 @@ import "./App.css";
 import NumberContainer from "./components/NumberContainer";
 import StatsContainer from "./components/StatsContainer";
 import { MatchStat } from "./types";
-import { DEFAULT_MATCH_STATS } from "./consts";
+import { DEFAULT_MATCH_STATS, HIGHEST_MATCH_COUNT } from "./consts";
 
 function App() {
     const [numbers, setNumbers] = useState<number[]>([]);
@@ -70,7 +70,7 @@ function App() {
 
     const userNumberContainers = useMemo(
         () =>
-            Array.from({ length: 5 }).map((_, index) => (
+            Array.from({ length: HIGHEST_MATCH_COUNT }).map((_, index) => (
                 <NumberContainer
                     key={index}
                     value={numbers[index]}
