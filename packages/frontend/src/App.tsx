@@ -3,7 +3,7 @@ import "./App.css";
 import NumberContainer from "./components/NumberContainer";
 import StatsContainer from "./components/StatsContainer";
 import { MatchStat } from "./types";
-import { DEFAULT_MATCH_STATS } from "./consts";
+import { DEFAULT_MATCH_STATS, HIGHEST_MATCH_COUNT, YEAR_CAP } from "./consts";
 import Checkbox from "./components/Checkbox";
 import { getEmptyNumbers, getRandomNumbers } from "./helpers";
 
@@ -18,6 +18,9 @@ function App() {
         useState<MatchStat>(DEFAULT_MATCH_STATS);
     const [playWithRandomNumbers, setPlayWithRandomNumbers] =
         useState<boolean>(false);
+    const [isSimulating, setIsSimulating] = useState(false);
+    const [simulationIntervalMs, setSimulationIntervalMs] = useState(500);
+    const simulationRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         const socket = new WebSocket("ws://localhost:8080");
@@ -57,7 +60,7 @@ function App() {
         });
     };
 
-    const handleDraw = () => {
+    const handleDraw = useCallback(() => {
         const numbersToSend = playWithRandomNumbers
             ? getRandomNumbers()
             : numbers;
@@ -72,7 +75,33 @@ function App() {
                 numbers: numbersToSend,
             })
         );
-    };
+    }, [numbers, playWithRandomNumbers]);
+
+    useEffect(() => {
+        if (isSimulating) {
+            simulationRef.current = setInterval(() => {
+                handleDraw();
+            }, simulationIntervalMs);
+        } else if (simulationRef.current) {
+            clearInterval(simulationRef.current);
+            simulationRef.current = null;
+        }
+
+        return () => {
+            if (simulationRef.current) {
+                clearInterval(simulationRef.current);
+            }
+        };
+    }, [isSimulating, simulationIntervalMs, handleDraw]);
+
+    useEffect(() => {
+        if (
+            playedTickets / 52 >= YEAR_CAP ||
+            matchStats[HIGHEST_MATCH_COUNT] === 1
+        ) {
+            setIsSimulating(false);
+        }
+    }, [playedTickets, matchStats]);
 
     const handlePlayWithRandomNumbersChange = useCallback(
         (checked: boolean) => {
@@ -81,6 +110,15 @@ function App() {
         },
         []
     );
+
+    const handleSimulationToggle = useCallback(() => {
+        setIsSimulating((prev) => !prev);
+    }, []);
+
+    const handleSimulationIntervalChange = useCallback((value: number) => {
+        const clampedValue = Math.min(Math.max(value, 10), 1000);
+        setSimulationIntervalMs(clampedValue);
+    }, []);
 
     const drawnNumberContainers = drawnNumbers.map((number, index) => (
         <NumberContainer key={index} value={number} />
@@ -113,7 +151,16 @@ function App() {
                 onChange={handlePlayWithRandomNumbersChange}
                 label="Play with random numbers"
             />
-            <button onClick={handleDraw}>Draw</button>
+            <input
+                type="number"
+                value={simulationIntervalMs}
+                onChange={(e) =>
+                    handleSimulationIntervalChange(Number(e.target.value))
+                }
+            />
+            <button onClick={handleSimulationToggle}>
+                {isSimulating ? "Stop" : "Start"}
+            </button>
         </>
     );
 }
