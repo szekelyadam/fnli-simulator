@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./App.css";
 
 function App() {
@@ -26,22 +26,22 @@ function App() {
         return () => connection.current?.close();
     }, []);
 
-    const handleNumberChange = (index: number, value: number) => {
+    const handleNumberChange = useCallback((index: number, value: number) => {
         setNumbers((prevNumbers) => {
             const newNumbers = [...prevNumbers];
             newNumbers[index] = value;
             return newNumbers;
         });
-    };
+    }, []);
 
-    const handleDraw = () => {
+    const handleDraw = useCallback(() => {
         connection.current?.send(
             JSON.stringify({
                 type: "draw",
                 numbers,
             })
         );
-    };
+    }, [numbers]);
 
     return (
         <>
