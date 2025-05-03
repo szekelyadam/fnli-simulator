@@ -8,6 +8,13 @@ export function drawNumbers(): number[] {
     while (numbers.length < COUNT) {
         const randomBytesBuffer = randomBytes(4);
         const randomValue = randomBytesBuffer.readUInt32BE(0);
+
+        // Rejection sampling to avoid modulo bias
+        const maxAcceptableValue = Math.floor(0xffffffff / range) * range;
+        if (randomValue >= maxAcceptableValue) {
+            continue; // Skip this value to avoid bias
+        }
+
         const randomNumber = (randomValue % range) + MIN;
 
         if (!numbers.includes(randomNumber)) {
