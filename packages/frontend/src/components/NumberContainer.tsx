@@ -7,7 +7,7 @@ const NumberContainer = ({ value, onChange }: NumberContainerProps) => {
     return (
         <input
             type="number"
-            value={value}
+            value={value === undefined ? "" : value}
             disabled={!onChange}
             onChange={(e) => onChange?.(Number(e.target.value))}
         />

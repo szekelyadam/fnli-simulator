@@ -3,15 +3,21 @@ import "./App.css";
 import NumberContainer from "./components/NumberContainer";
 import StatsContainer from "./components/StatsContainer";
 import { MatchStat } from "./types";
-import { DEFAULT_MATCH_STATS, HIGHEST_MATCH_COUNT } from "./consts";
+import { DEFAULT_MATCH_STATS } from "./consts";
+import Checkbox from "./components/Checkbox";
+import { getEmptyNumbers, getRandomNumbers } from "./helpers";
 
 function App() {
-    const [numbers, setNumbers] = useState<number[]>([]);
-    const [drawnNumbers, setDrawnNumbers] = useState<number[]>([]);
     const connection = useRef<WebSocket | null>(null);
+
+    const [numbers, setNumbers] = useState<number[]>(getEmptyNumbers());
+    const [drawnNumbers, setDrawnNumbers] =
+        useState<number[]>(getEmptyNumbers());
     const [playedTickets, setPlayedTickets] = useState<number>(0);
     const [matchStats, setMatchStats] =
         useState<MatchStat>(DEFAULT_MATCH_STATS);
+    const [playWithRandomNumbers, setPlayWithRandomNumbers] =
+        useState<boolean>(false);
 
     useEffect(() => {
         const socket = new WebSocket("ws://localhost:8080");
@@ -43,42 +49,56 @@ function App() {
         return () => connection.current?.close();
     }, []);
 
-    const handleNumberChange = useCallback((index: number, value: number) => {
+    const handleNumberChange = (index: number, value: number) => {
         setNumbers((prevNumbers) => {
             const newNumbers = [...prevNumbers];
             newNumbers[index] = value;
             return newNumbers;
         });
-    }, []);
+    };
 
-    const handleDraw = useCallback(() => {
+    const handleDraw = () => {
+        const numbersToSend = playWithRandomNumbers
+            ? getRandomNumbers()
+            : numbers;
+
+        if (playWithRandomNumbers) {
+            setNumbers(numbersToSend);
+        }
+
         connection.current?.send(
             JSON.stringify({
                 type: "draw",
-                numbers,
+                numbers: numbersToSend,
             })
         );
-    }, [numbers]);
+    };
 
-    const drawnNumberContainers = useMemo(
-        () =>
-            drawnNumbers.map((number, index) => (
-                <NumberContainer key={index} value={number} />
-            )),
-        [drawnNumbers]
+    const handlePlayWithRandomNumbersChange = useCallback(
+        (checked: boolean) => {
+            setNumbers(getEmptyNumbers());
+            setPlayWithRandomNumbers(checked);
+        },
+        []
     );
 
-    const userNumberContainers = useMemo(
-        () =>
-            Array.from({ length: HIGHEST_MATCH_COUNT }).map((_, index) => (
-                <NumberContainer
-                    key={index}
-                    value={numbers[index]}
-                    onChange={(value) => handleNumberChange(index, value)}
-                />
-            )),
-        [numbers, handleNumberChange]
-    );
+    const drawnNumberContainers = drawnNumbers.map((number, index) => (
+        <NumberContainer key={index} value={number} />
+    ));
+
+    const userNumberContainers = useMemo(() => {
+        return getEmptyNumbers().map((_, index) => (
+            <NumberContainer
+                key={index}
+                value={numbers[index]}
+                onChange={
+                    playWithRandomNumbers
+                        ? undefined
+                        : (value) => handleNumberChange(index, value)
+                }
+            />
+        ));
+    }, [numbers, handleNumberChange]);
 
     return (
         <>
@@ -86,14 +106,13 @@ function App() {
                 playedTickets={playedTickets}
                 matchStats={matchStats}
             />
-            <div>
-                {drawnNumberContainers.length > 0 ? (
-                    drawnNumberContainers
-                ) : (
-                    <div>No drawn numbers yet</div>
-                )}
-            </div>
+            <div>{drawnNumberContainers}</div>
             <div>{userNumberContainers}</div>
+            <Checkbox
+                checked={playWithRandomNumbers}
+                onChange={handlePlayWithRandomNumbersChange}
+                label="Play with random numbers"
+            />
             <button onClick={handleDraw}>Draw</button>
         </>
     );
