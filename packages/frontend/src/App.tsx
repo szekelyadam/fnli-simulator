@@ -1,11 +1,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 import NumberContainer from "./components/NumberContainer";
+import StatsContainer from "./components/StatsContainer";
+import { MatchStat } from "./types";
+import { DEFAULT_MATCH_STATS, HIGHEST_MATCH_COUNT } from "./consts";
 
 function App() {
     const [numbers, setNumbers] = useState<number[]>([]);
     const [drawnNumbers, setDrawnNumbers] = useState<number[]>([]);
     const connection = useRef<WebSocket | null>(null);
+    const [playedTickets, setPlayedTickets] = useState<number>(0);
+    const [matchStats, setMatchStats] =
+        useState<MatchStat>(DEFAULT_MATCH_STATS);
 
     useEffect(() => {
         const socket = new WebSocket("ws://localhost:8080");
@@ -19,6 +25,16 @@ function App() {
 
             if (data.type === "result") {
                 setDrawnNumbers(data.drawnNumbers);
+                setPlayedTickets((playedTickets) => playedTickets + 1);
+                if (data.matches in matchStats) {
+                    setMatchStats((prevMatchStats) => {
+                        const newMatchStats = { ...prevMatchStats };
+                        newMatchStats[data.matches] =
+                            newMatchStats[data.matches] + 1;
+
+                        return newMatchStats;
+                    });
+                }
             }
         });
 
@@ -54,7 +70,7 @@ function App() {
 
     const userNumberContainers = useMemo(
         () =>
-            Array.from({ length: 5 }).map((_, index) => (
+            Array.from({ length: HIGHEST_MATCH_COUNT }).map((_, index) => (
                 <NumberContainer
                     key={index}
                     value={numbers[index]}
@@ -66,6 +82,10 @@ function App() {
 
     return (
         <>
+            <StatsContainer
+                playedTickets={playedTickets}
+                matchStats={matchStats}
+            />
             <div>
                 {drawnNumberContainers.length > 0 ? (
                     drawnNumberContainers
