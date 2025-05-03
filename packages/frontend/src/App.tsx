@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
+import NumberContainer from "./components/NumberContainer";
 
 function App() {
     const [numbers, setNumbers] = useState<number[]>([]);
@@ -43,23 +44,36 @@ function App() {
         );
     }, [numbers]);
 
+    const drawnNumberContainers = useMemo(
+        () =>
+            drawnNumbers.map((number, index) => (
+                <NumberContainer key={index} value={number} />
+            )),
+        [drawnNumbers]
+    );
+
+    const userNumberContainers = useMemo(
+        () =>
+            Array.from({ length: 5 }).map((_, index) => (
+                <NumberContainer
+                    key={index}
+                    value={numbers[index]}
+                    onChange={(value) => handleNumberChange(index, value)}
+                />
+            )),
+        [numbers, handleNumberChange]
+    );
+
     return (
         <>
             <div>
-                {drawnNumbers.map((number) => (
-                    <div key={number}>{number}</div>
-                ))}
+                {drawnNumberContainers.length > 0 ? (
+                    drawnNumberContainers
+                ) : (
+                    <div>No drawn numbers yet</div>
+                )}
             </div>
-            {Array.from({ length: 5 }).map((_, index) => (
-                <input
-                    key={index}
-                    type="number"
-                    value={numbers[index]}
-                    onChange={(e) =>
-                        handleNumberChange(index, Number(e.target.value))
-                    }
-                />
-            ))}
+            <div>{userNumberContainers}</div>
             <button onClick={handleDraw}>Draw</button>
         </>
     );
