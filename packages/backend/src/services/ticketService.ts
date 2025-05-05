@@ -1,5 +1,7 @@
+import { Ticket } from "@prisma/client";
 import { randomBytes } from "crypto";
-import { COUNT, MAX, MIN } from "./consts";
+import db from "./db";
+import { COUNT, MAX, MIN } from "../consts";
 
 export function drawNumbers(): number[] {
     const numbers: number[] = [];
@@ -29,3 +31,11 @@ export function countMatchingNumbers(arr1: number[], arr2: number[]): number {
     const set = new Set(arr1);
     return arr2.filter((num) => set.has(num)).length;
 }
+
+export const saveTicket = async (
+    ticket: Omit<Ticket, "id" | "createdAt" | "updatedAt">
+) => {
+    await db.ticket.create({
+        data: ticket,
+    });
+};
