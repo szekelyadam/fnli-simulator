@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import "./App.css";
 import NumberContainer from "./components/NumberContainer";
 import StatsContainer from "./components/StatsContainer";
 import { MatchStat } from "./types";
