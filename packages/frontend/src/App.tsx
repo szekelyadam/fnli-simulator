@@ -6,7 +6,7 @@ import { DEFAULT_MATCH_STATS, HIGHEST_MATCH_COUNT, YEAR_CAP } from "./consts";
 import Checkbox from "./components/Checkbox";
 import { getEmptyNumbers, getRandomNumbers } from "./helpers";
 import Header from "./components/Header";
-
+import ContainerTitle from "./components/ContainerTitle";
 function App() {
     const connection = useRef<WebSocket | null>(null);
 
@@ -141,27 +141,30 @@ function App() {
     return (
         <>
             <Header />
-            <StatsContainer
-                playedTickets={playedTickets}
-                matchStats={matchStats}
-            />
-            <div>{drawnNumberContainers}</div>
-            <div>{userNumberContainers}</div>
-            <Checkbox
-                checked={playWithRandomNumbers}
-                onChange={handlePlayWithRandomNumbersChange}
-                label="Play with random numbers"
-            />
-            <input
-                type="number"
-                value={simulationIntervalMs}
-                onChange={(e) =>
-                    handleSimulationIntervalChange(Number(e.target.value))
-                }
-            />
-            <button onClick={handleSimulationToggle}>
-                {isSimulating ? "Stop" : "Start"}
-            </button>
+            <div className="flex flex-col gap-12 items-start justify-center bg-white my-[clamp(24px,5vw,48px)] mx-[clamp(24px,10vw,116px)] py-[clamp(16px,5vw,48px)] px-[clamp(16px,8vw,78px)] rounded-[24px] shadow-[2px_2px_10px_0px_#0000001A]">
+                <ContainerTitle title="Result" />
+                <StatsContainer
+                    playedTickets={playedTickets}
+                    matchStats={matchStats}
+                />
+                <div>{drawnNumberContainers}</div>
+                <div>{userNumberContainers}</div>
+                <Checkbox
+                    checked={playWithRandomNumbers}
+                    onChange={handlePlayWithRandomNumbersChange}
+                    label="Play with random numbers"
+                />
+                <input
+                    type="number"
+                    value={simulationIntervalMs}
+                    onChange={(e) =>
+                        handleSimulationIntervalChange(Number(e.target.value))
+                    }
+                />
+                <button onClick={handleSimulationToggle}>
+                    {isSimulating ? "Stop" : "Start"}
+                </button>
+            </div>
         </>
     );
 }

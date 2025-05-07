@@ -2,10 +2,15 @@
 @import "@fontsource/nunito";
 @import "@fontsource/nunito/700.css";
 
+@theme {
+    --color-primary: #a5d9c8;
+}
+
 :root {
     font-family: "Nunito", system-ui, Avenir, Helvetica, Arial, sans-serif;
-    line-height: 100%;
     font-weight: 400;
+
+    background-color: #f2f2f2;
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
