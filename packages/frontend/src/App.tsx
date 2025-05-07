@@ -5,6 +5,7 @@ import { MatchStat } from "./types";
 import { DEFAULT_MATCH_STATS, HIGHEST_MATCH_COUNT, YEAR_CAP } from "./consts";
 import Checkbox from "./components/Checkbox";
 import { getEmptyNumbers, getRandomNumbers } from "./helpers";
+import Header from "./components/Header";
 
 function App() {
     const connection = useRef<WebSocket | null>(null);
@@ -139,6 +140,7 @@ function App() {
 
     return (
         <>
+            <Header />
             <StatsContainer
                 playedTickets={playedTickets}
                 matchStats={matchStats}
