@@ -1,7 +1,8 @@
 @import "tailwindcss";
+@import "@fontsource/nunito";
 
 :root {
-    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    font-family: "Nunito", system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 100%;
     font-weight: 400;
 
