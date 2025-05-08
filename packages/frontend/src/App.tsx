@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import "./App.css";
-import NumberContainer from "./components/NumberContainer";
+import { useCallback, useEffect, useRef, useState } from "react";
 import StatsContainer from "./components/StatsContainer";
 import { MatchStat } from "./types";
 import { DEFAULT_MATCH_STATS, HIGHEST_MATCH_COUNT, YEAR_CAP } from "./consts";
 import Checkbox from "./components/Checkbox";
 import { getEmptyNumbers, getRandomNumbers } from "./helpers";
+import Header from "./components/Header";
+import ContainerTitle from "./components/ContainerTitle";
+import NumberContainer from "./components/NumberContainer";
 
 function App() {
     const connection = useRef<WebSocket | null>(null);
@@ -120,47 +121,47 @@ function App() {
         setSimulationIntervalMs(clampedValue);
     }, []);
 
-    const drawnNumberContainers = drawnNumbers.map((number, index) => (
-        <NumberContainer key={index} value={number} />
-    ));
-
-    const userNumberContainers = useMemo(() => {
-        return getEmptyNumbers().map((_, index) => (
-            <NumberContainer
-                key={index}
-                value={numbers[index]}
-                onChange={
-                    playWithRandomNumbers
-                        ? undefined
-                        : (value) => handleNumberChange(index, value)
-                }
-            />
-        ));
-    }, [numbers, handleNumberChange]);
-
     return (
         <>
-            <StatsContainer
-                playedTickets={playedTickets}
-                matchStats={matchStats}
-            />
-            <div>{drawnNumberContainers}</div>
-            <div>{userNumberContainers}</div>
-            <Checkbox
-                checked={playWithRandomNumbers}
-                onChange={handlePlayWithRandomNumbersChange}
-                label="Play with random numbers"
-            />
-            <input
-                type="number"
-                value={simulationIntervalMs}
-                onChange={(e) =>
-                    handleSimulationIntervalChange(Number(e.target.value))
-                }
-            />
-            <button onClick={handleSimulationToggle}>
-                {isSimulating ? "Stop" : "Start"}
-            </button>
+            <Header />
+            <div className="flex flex-col gap-12 items-start justify-center bg-white my-[clamp(24px,5vw,48px)] mx-[clamp(24px,10vw,116px)] py-[clamp(16px,5vw,48px)] px-[clamp(16px,8vw,78px)] rounded-[24px] shadow-[2px_2px_10px_0px_#0000001A]">
+                <ContainerTitle title="Result" />
+                <StatsContainer
+                    playedTickets={playedTickets}
+                    matchStats={matchStats}
+                />
+                <div className="grid grid-cols-[1fr_2fr] gap-6">
+                    <NumberContainer
+                        label="Winning numbers"
+                        numbers={drawnNumbers}
+                    />
+                    <NumberContainer
+                        label="Your numbers"
+                        numbers={numbers}
+                        onChange={
+                            playWithRandomNumbers
+                                ? undefined
+                                : (index, value) =>
+                                      handleNumberChange(index, value)
+                        }
+                    />
+                </div>
+                <Checkbox
+                    checked={playWithRandomNumbers}
+                    onChange={handlePlayWithRandomNumbersChange}
+                    label="Play with random numbers"
+                />
+                <input
+                    type="number"
+                    value={simulationIntervalMs}
+                    onChange={(e) =>
+                        handleSimulationIntervalChange(Number(e.target.value))
+                    }
+                />
+                <button onClick={handleSimulationToggle}>
+                    {isSimulating ? "Stop" : "Start"}
+                </button>
+            </div>
         </>
     );
 }

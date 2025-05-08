@@ -1,16 +1,32 @@
+import NumberInput from "./NumberInput";
+
 interface NumberContainerProps {
-    value: number;
-    onChange?: (value: number) => void;
+    label: string;
+    numbers: number[];
+    onChange?: (index: number, value: number) => void;
 }
 
-const NumberContainer = ({ value, onChange }: NumberContainerProps) => {
+const NumberContainer = ({
+    label,
+    numbers,
+    onChange,
+}: NumberContainerProps) => {
     return (
-        <input
-            type="number"
-            value={value === undefined ? "" : value}
-            disabled={!onChange}
-            onChange={(e) => onChange?.(Number(e.target.value))}
-        />
+        <>
+            <div className="flex items-center">
+                <p>{label}:</p>
+            </div>
+            <div className="flex flex-row gap-4">
+                {numbers.map((number, index) => (
+                    <NumberInput
+                        key={index}
+                        value={number}
+                        disabled={onChange === undefined}
+                        onChange={(value) => onChange?.(index, value)}
+                    />
+                ))}
+            </div>
+        </>
     );
 };
 
