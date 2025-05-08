@@ -1,14 +1,16 @@
 @import "tailwindcss";
 @import "@fontsource/nunito";
 @import "@fontsource/nunito/700.css";
-
+@import "@fontsource/nunito/800.css";
 @theme {
     --color-primary: #a5d9c8;
+    --color-secondary: #f6f0c6;
 }
 
 :root {
     font-family: "Nunito", system-ui, Avenir, Helvetica, Arial, sans-serif;
     font-weight: 400;
+    color: #020056;
 
     background-color: #f2f2f2;
 

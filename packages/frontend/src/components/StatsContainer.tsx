@@ -8,10 +8,10 @@ interface StatsContainerProps {
 
 const StatsContainer = ({ playedTickets, matchStats }: StatsContainerProps) => {
     return (
-        <div>
+        <>
             <OverallStatsContainer playedTickets={playedTickets} />
             <MatchStatsContainer matchStats={matchStats} />
-        </div>
+        </>
     );
 };
 
